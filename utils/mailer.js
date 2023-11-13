@@ -10,10 +10,10 @@ const sendmail = async (email,otp) => {
         <div
           style="max-width: 90%; margin: auto; padding-top: 20px"
         >
-          <center><h1>Welcome to <span style="color:purple;">Buzzr!</span></h1></center>
+          <center><h1>Welcome to <span style="color:navy;">Buzzr!</span></h1></center>
           <h3>We are glad to have you!</h3>
           <p style="margin-bottom: 30px;">Please enter this OTP to proceed further</p>
-          <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center; color:purple;">${otp}</h1>
+          <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center; color:navy;">${otp}</h1>
      </div>
       `,
     }

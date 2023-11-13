@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
 const questionSchema = mongoose.Schema({
-    question: {
+    text: {
         type: String,
         required: true,
     },
@@ -26,3 +26,7 @@ const questionSchema = mongoose.Schema({
         ref: "user",
     }
 },{timestamps: true});
+
+const questionModel = mongoose.model("question", questionSchema);
+
+module.exports = questionModel;

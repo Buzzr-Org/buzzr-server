@@ -9,8 +9,7 @@ const quizSchema = mongoose.Schema({
     questions:[{
         question:{type: ObjectId, ref: "question"},
         time: {type: Number, default: 20},
-        position: Number,
-        points: Number,
+        points: {type: Number,default: 10},
     }],
     createdBy: {
         type: ObjectId,
