@@ -14,7 +14,20 @@ const userSchema = mongoose.Schema({
     password:{
         type:String,
         required:true
-    }
+    },
+    verify:{
+        type: Boolean,
+        default: false,
+    },
+    role:{
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
+    },
+    lastRefesh: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
 const userModel = mongoose.model("user",userSchema);
