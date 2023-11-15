@@ -20,9 +20,9 @@ const userSchema = mongoose.Schema({
         enum: ["user", "admin"],
         default: "user",
     },
-    lastRefesh: {
-        type: Date,
-        default: Date.now,
+    lastRefresh: {
+        type: Number,
+        default: Math.floor(Date.now() / 1000),
     },
 });
 

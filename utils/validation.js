@@ -14,17 +14,35 @@ module.exports = {
         password: Joi.string().required().min(6),
         otp: Joi.string().required().length(6)
     }),
+    // Needs to be changed - not working
     createQuesion : Joi.object({
         text: Joi.string().required().trim(),
-        options: Joi.array().min(2).max(4).required().items(Joi.string().required().trim()),
-        answerIndex: Joi.number().required().min(0).max(3),
+        options: Joi.array().min(2).max(4).required().items(Joi.object({
+            option: Joi.string().required().trim(),
+            isRight: Joi.boolean().required(),
+        })),
+    }),
+    // Needs to be changed - not working
+    updateQuestion : Joi.object({
+        text: Joi.string().trim(),
+        options: Joi.array().min(2).max(4).required().items(Joi.object({
+            option: Joi.string().required().trim(),
+            isRight: Joi.boolean().required(),
+        })),
     }),
     createQuiz : Joi.object({
-        name: Joi.string().required().trim(),
-        questions: Joi.array().items(Joi.object({
-            question: Joi.string().required().trim(),
-            time: Joi.number().required().min(1).max(120),
-            points: Joi.number().required().min(0).max(100),
-        })).required(),
+        title: Joi.string().required().trim().min(2).max(50),
+    }),
+    addQuizQuestion : Joi.object({
+        quesId: Joi.string().required(),
+        time: Joi.number().required().min(5).max(120),
+        points: Joi.number().required().min(0).max(100),
+    }),
+    removeQuizQuestion : Joi.object({
+        quesId: Joi.string().required()
+    }),
+    updateQuizQuestion : Joi.object({
+        time: Joi.number().required().min(5).max(120),
+        points: Joi.number().required().min(0).max(100),
     }),
 }

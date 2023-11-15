@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt");
 const otpGenerator = require('otp-generator');
 const mailer = require("../utils/mailer");
-const {User,Otp} = require("../models");
+const {User,Otp,Question} = require("../models");
 const { ErrorHandler } = require('../middleware/errors');
 const jv = require("../utils/validation");
 const asyncWrapper = require("../utils/asyncWrapper");
@@ -108,5 +108,13 @@ module.exports = {
             user: newuser
         }
         return res.status(201).json({success:true,message:"Signed Up Successfully",data})
+    }),
+    myQuestions : asyncWrapper(async (req,res,next) => {
+        const user = req.user;
+        const questions = await Question.find({createdBy:user._id});
+        const data = {
+            questions
+        }
+        return res.status(200).json({success:true,message:"Questions Fetched Successfully",data});
     })
 }

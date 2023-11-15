@@ -8,7 +8,6 @@ const gameSessionSchema = mongoose.Schema({
         required: true 
     },
     participants: [{
-        id: { type: String, required: true, unique: true},
         name: { type: String, required: true },
         score: { type: Number, default: 0 },
     }],
