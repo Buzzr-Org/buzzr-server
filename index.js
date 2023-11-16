@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 const {userRoutes, quizRoutes} = require('./routes');
 const {errorMiddleware} = require('./middleware/errors');
 const redisClient = require('./utils/redis');
-const socketConnection = require('./utils/socket');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
@@ -38,10 +37,10 @@ if (cluster.isPrimary) {
     // Connecting to MongoDB and Starting the Server
     mongoose.connect(process.env.DB_URI).then(() => {
         console.log("DB Connected");
-        const server = app.listen(PORT, "0.0.0.0", () => {
-          console.log(`Server is running on port ${PORT}`);
-        });
-		socketConnection(server);
+        const server = app.listen(Number(PORT), "0.0.0.0");
+		
+		require('./utils/socket').init(server);
+		
     });
 
 	// Express app security

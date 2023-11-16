@@ -1,18 +1,41 @@
 const { Server } = require("socket.io");
-const Message = require("../models");
 
-const initializedSocket = (server) => {
-  const io = new Server(server, {
-    cors: {
-      origin: "*",
-    },
-  });
+const init = (server) => {
+    const io = new Server(server, {
+        cors: {
+          origin: "*",
+        },
+    });
+    io.on('connection', socket => {
+        console.log('connection made to socket.io');
+        socket.emit('connected','connected to socket.io');
+        try{
+            
 
-  io.on("connection", (socket) => {
-    console.log(
-      `A socket connection to the server has been made: ${socket.id}`
-    );
-  });
-};
+            // socket.on('setup',(userData)=>{
+            //     socket.join(userData.id);
+            //     console.log('user with userId ' + userData.id + ' connected');
+            //     socket.emit('connected','user '+ userData.id +' connected');
+            // });
 
-module.exports = initializedSocket;
+            // socket.on('putmessage',(user)=>{
+            //     const {id,message} = user;
+            //     io.to(id).emit('getmessage',message);
+            // });        
+
+            socket.on('joinGameSession',(data)=>{
+                const {userId,gameSessionId} = data;
+                socket.join(gameSessionId);
+                console.log(`user with id ${userId} joined game ${gameSessionId}`)
+                socket.emit('connected',`user with id ${userId} joined game ${gameSessionId}`)
+            });
+
+        }catch(err){
+            console.log(err);
+        }
+    });
+}
+
+module.exports = {
+    init
+}

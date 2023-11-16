@@ -3,15 +3,15 @@ const { ObjectId } = mongoose.Schema;
 
 const gameSessionSchema = mongoose.Schema({
     quiz: {
-        type: ObjectId, 
+        type: ObjectId,
         ref: 'quiz',
-        required: true 
+        required: true
     },
     participants: [{
         name: { type: String, required: true },
         score: { type: Number, default: 0 },
     }],
-    currentQuestionIndex: { 
+    currentQuestionIndex: {
         type: Number,
         default: 0
     },

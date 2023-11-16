@@ -2,7 +2,7 @@ const client = require('./redis');
 
 exports.setCache = async (key, value) => {
     return new Promise((resolve) => {
-      redisClient.set(key, value, (err, res) => {
+      client.set(key, value, (err, res) => {
         if (err) console.error(err);
         resolve(res);
       });
@@ -11,7 +11,7 @@ exports.setCache = async (key, value) => {
   
 exports.getCache = async (key) => {
     return new Promise((resolve) => {
-      redisClient.get(key, (err, res) => {
+      client.get(key, (err, res) => {
         if (err) console.error(err);
         resolve(res);
       });
