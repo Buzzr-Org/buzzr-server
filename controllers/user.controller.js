@@ -16,7 +16,7 @@ module.exports = {
 
         const user = await User.findOne({ email });
         if (!user) 
-            return next(new ErrorHandler(404,"User Not Found"));
+            return next(new ErrorHandler(400,"Invalid Credentials"));
 
         const result = await bcrypt.compare(password, user.password);
         if (!result) return next(new ErrorHandler(400,"Invalid Credentials"));

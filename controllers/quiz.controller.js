@@ -1,3 +1,4 @@
+const cloudinary = require('cloudinary').v2;
 const {Quiz, Question} = require("../models");
 const {ErrorHandler} = require("../middleware/errors");
 const jv = require("../utils/validation");
@@ -7,10 +8,25 @@ module.exports = {
     createQuestion : asyncWrapper(async (req, res) => {
         const body = await jv.createQuesion.validateAsync(req.body);
         const {text, options} = body;
+        let file = req.files ? req.files.file : null;
+        let link = null, type = "none";
+        if(file){
+            const result = await cloudinary.uploader.upload(file.tempFilePath,{
+                public_id: `${Date.now()/100}`,
+                resource_type:'auto',
+                folder:'images'
+            });
+            type = result.resource_type;
+            link = result.secure_url;
+        }
         const question = await Question.create({
             text,
             options,
-            createdBy: req.user._id
+            createdBy: req.user._id,
+            media: {
+                link,
+                type
+            }
         });
         const data = {
             question
