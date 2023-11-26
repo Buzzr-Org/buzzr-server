@@ -3,9 +3,10 @@ const {Quiz, Question} = require("../models");
 const {ErrorHandler} = require("../middleware/errors");
 const jv = require("../utils/validation");
 const asyncWrapper = require("../utils/asyncWrapper");
+const {removeQuestionFromQuizzes} = require("../utils/functions");
 
 module.exports = {
-    createQuestion : asyncWrapper(async (req, res) => {
+    createQuestion : asyncWrapper(async (req, res, next) => {
         const body = await jv.createQuesion.validateAsync(req.body);
         const {text, options} = body;
         let file = req.files ? req.files.file : null;
@@ -33,7 +34,7 @@ module.exports = {
         }
         return res.status(200).json({success:true, message:"Question Created Successfully",data});
     }),
-    updateQuestion : asyncWrapper(async (req, res) => {
+    updateQuestion : asyncWrapper(async (req, res, next) => {
         const body = await jv.updateQuestion.validateAsync(req.body);
         const quesId = req.params.quesId;
         const ques = await  Question.findById(quesId);
@@ -49,26 +50,29 @@ module.exports = {
         }
         return res.status(200).json({success:true, message:"Question Updated Successfully",data});
     }),
-    deleteQuestion : asyncWrapper(async (req, res) => {
+    deleteQuestion : asyncWrapper(async (req, res, next) => {
         const quesId = req.params.quesId;
         const ques = await Question.findById(quesId);
         if(!ques)
             return next(new ErrorHandler(404,"Question Not Found"));
         const user = req.user;
-        if(ques.createdBy!=user._id)
+        console.log(ques.createdBy,user._id);
+        if(ques.createdBy.toString()!=user._id.toString())
             return next(new ErrorHandler(401,"Unauthorized"));
-        ques.remove();
+        await Question.findByIdAndDelete(quesId);
+        removeQuestionFromQuizzes(quesId);
         const data = {
             question: ques
         }
         return res.status(200).json({success:true, message:"Question Deleted Successfully",data});
     }),
-    createQuiz : asyncWrapper(async (req, res) => {
+    createQuiz : asyncWrapper(async (req, res, next) => {
         const body = await jv.createQuiz.validateAsync(req.body);
-        const {title} = body;
+        const {title,maxQuestions} = body;
         const user = req.user;
         const quiz = await Quiz.create({
             title,
+            maxQuestions,
             createdBy: user._id
         });
         const data = {
@@ -76,7 +80,7 @@ module.exports = {
         }
         return res.status(200).json({success:true, message:"Quiz Created Successfully",data});
     }),
-    removeQuizQuestion: asyncWrapper(async (req, res) => {
+    removeQuizQuestion: asyncWrapper(async (req, res, next) => {
         const body = await jv.removeQuizQuestion.validateAsync(req.body);
         const quizId = req.params.quizId;
         const quesId = body.quesId;
@@ -90,7 +94,7 @@ module.exports = {
         }
         return res.status(200).json({success:true, message:"Question Removed Successfully from Quiz",data});
     }),
-    addQuizQuestion: asyncWrapper(async (req, res) => {
+    addQuizQuestion: asyncWrapper(async (req, res, next) => {
         const body = req.body;
         const quizId = req.params.quizId;
         const {quesId,time=20,points=10} = body;
@@ -104,7 +108,7 @@ module.exports = {
         quiz.save();
         return res.status(200).json({success:true, message:"Question Added Successfully to Quiz"});
     }),
-    updateQuizQuestion : asyncWrapper(async (req, res) => {
+    updateQuizQuestion : asyncWrapper(async (req, res, next) => {
         const body = req.body;
         const quizId = req.params.quizId;
         const quesId = req.params.quesId;
@@ -120,7 +124,7 @@ module.exports = {
         quiz.save();
         return res.status(200).json({success:true, message:"Question Updated Successfully in Quiz"});
     }),
-    getQuiz : asyncWrapper(async (req, res) => {
+    getQuiz : asyncWrapper(async (req, res, next) => {
         const quizId = req.params.quizId;
 
         const quiz = await Quiz.findById(quizId).populate("questions.question");
@@ -131,8 +135,8 @@ module.exports = {
         }
         return res.status(200).json({success:true, message:"Quiz Fetched Successfully",data});
     }),
-    getQuizzes : asyncWrapper(async (req, res) => {
-        const quizzes = await Quiz.find({},{title:1}).populate("createdBy",{name:1});
+    getQuizzes : asyncWrapper(async (req, res, next) => {
+        const quizzes = await Quiz.find({}).populate("createdBy",{name:1});
         const data = {
             quizzes
         }

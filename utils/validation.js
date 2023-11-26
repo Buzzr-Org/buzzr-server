@@ -31,7 +31,8 @@ module.exports = {
         })),
     }),
     createQuiz : Joi.object({
-        title: Joi.string().required().trim().min(2).max(50),
+        title: Joi.string().required().trim().min(1).max(15),
+        maxQuestions: Joi.number().required().min(5).max(25),
     }),
     addQuizQuestion : Joi.object({
         quesId: Joi.string().required(),

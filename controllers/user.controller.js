@@ -2,12 +2,16 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt");
 const otpGenerator = require('otp-generator');
 const mailer = require("../utils/mailer");
-const {User,Otp,Question} = require("../models");
+const {User,Otp,Question,Quiz} = require("../models");
 const { ErrorHandler } = require('../middleware/errors');
 const jv = require("../utils/validation");
 const asyncWrapper = require("../utils/asyncWrapper");
 
 module.exports = {
+    checkValidToken : asyncWrapper(async (req,res,next) => {
+        const user = req.user;
+        return res.status(200).json({success:true,message:"Valid Token",user});
+    }),
     login : asyncWrapper(async (req, res, next) => {
         const body = await jv.loginSchema.validateAsync(req.body);
 
@@ -111,10 +115,18 @@ module.exports = {
     }),
     myQuestions : asyncWrapper(async (req,res,next) => {
         const user = req.user;
-        const questions = await Question.find({createdBy:user._id});
+        const questions = await Question.find({createdBy:user._id}).sort({createdAt:-1});
         const data = {
             questions
         }
         return res.status(200).json({success:true,message:"Questions Fetched Successfully",data});
-    })
+    }),
+    myQuizzes : asyncWrapper(async (req,res,next) => {
+        const user = req.user;
+        const quizzes = await Quiz.find({createdBy:user._id}).sort({createdAt:-1});
+        const data = {
+            quizzes
+        }
+        return res.status(200).json({success:true,message:"Quizzes Fetched Successfully",data});
+    }),
 }

@@ -6,6 +6,10 @@ const quizSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    maxQuestions:{
+        type: Number,
+        default: 5
+    },
     questions:[{
         question:{type: ObjectId, ref: "question"},
         time: {type: Number, default: 20},
