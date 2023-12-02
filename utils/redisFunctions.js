@@ -7,8 +7,8 @@ exports.setCache = async (key, value) => {
         resolve(res);
       });
     });
-  };
-  
+};
+
 exports.getCache = async (key) => {
     return new Promise((resolve) => {
       client.get(key, (err, res) => {

@@ -17,18 +17,12 @@ module.exports = {
     // Needs to be changed - not working
     createQuesion : Joi.object({
         text: Joi.string().required().trim(),
-        options: Joi.array().min(2).max(4).required().items(Joi.object({
-            option: Joi.string().required().trim(),
-            isRight: Joi.boolean().required(),
-        })),
+        options: Joi.string().min(1),
     }),
     // Needs to be changed - not working
     updateQuestion : Joi.object({
         text: Joi.string().trim(),
-        options: Joi.array().min(2).max(4).required().items(Joi.object({
-            option: Joi.string().required().trim(),
-            isRight: Joi.boolean().required(),
-        })),
+        options: Joi.string().min(1),
     }),
     createQuiz : Joi.object({
         title: Joi.string().required().trim().min(1).max(15),

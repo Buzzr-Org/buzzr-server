@@ -8,12 +8,13 @@ const {removeQuestionFromQuizzes} = require("../utils/functions");
 module.exports = {
     createQuestion : asyncWrapper(async (req, res, next) => {
         const body = await jv.createQuesion.validateAsync(req.body);
-        const {text, options} = body;
+        let {text, options} = body;
+        options = JSON.parse(options);
         let file = req.files ? req.files.file : null;
         let link = null, type = "none";
         if(file){
             const result = await cloudinary.uploader.upload(file.tempFilePath,{
-                public_id: `${Date.now()/100}`,
+                public_id: `${Math.floor(Date.now()/100)}`,
                 resource_type:'auto',
                 folder:'images'
             });
@@ -52,14 +53,16 @@ module.exports = {
     }),
     deleteQuestion : asyncWrapper(async (req, res, next) => {
         const quesId = req.params.quesId;
-        const ques = await Question.findById(quesId);
+        const ques = await Question.findByIdAndDelete(quesId);
         if(!ques)
             return next(new ErrorHandler(404,"Question Not Found"));
         const user = req.user;
-        console.log(ques.createdBy,user._id);
         if(ques.createdBy.toString()!=user._id.toString())
             return next(new ErrorHandler(401,"Unauthorized"));
-        await Question.findByIdAndDelete(quesId);
+        if(ques.media.type!="none"){
+            const imgNum = ques.media.link.split("/")[8].split(".")[0];
+            cloudinary.uploader.destroy(`images/${imgNum}`);
+        }
         removeQuestionFromQuizzes(quesId);
         const data = {
             question: ques
@@ -141,5 +144,13 @@ module.exports = {
             quizzes
         }
         return res.status(200).json({success:true, message:"Quizzes Fetched Successfully",data});
+    }),
+    deleteQuiz : asyncWrapper(async (req, res, next) => {
+        const quizId = req.params.quizId;
+        const quiz = await Quiz.deleteOne({_id:quizId,createdBy:req.user._id});
+        console.log(quiz);
+        if(!quiz)
+            return next(new ErrorHandler(404,"Quiz Not Found"));
+        return res.status(200).json({success:true, message:"Quiz Deleted Successfully"});
     }),
 }
