@@ -153,4 +153,15 @@ module.exports = {
             return next(new ErrorHandler(404,"Quiz Not Found"));
         return res.status(200).json({success:true, message:"Quiz Deleted Successfully"});
     }),
+    getUnselectedQuestions : asyncWrapper(async (req,res,next) => {
+        const quizId = req.params.quizId;
+        const quiz = await Quiz.findById(quizId);
+        const questionIdsInQuiz = quiz.questions.map(q => q.question);
+
+        const questions = await Question.find({ _id: { $nin: questionIdsInQuiz } });
+        const data = {
+            questions
+        }
+        return res.status(200).json({success:true, message:"Questions Fetched Successfully",data});
+    }),
 }
